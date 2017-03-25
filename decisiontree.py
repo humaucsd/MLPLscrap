@@ -102,68 +102,69 @@ resacc = anses + 2*test_labels.values
 
 #-------------------------------------
 #Expression size
-y = test_samps.loc[:,'F-Expr-Size'].values
-pairs = zip(resacc,y)
-x1 = list(filter(lambda x : x>0,  (map(lambda x: x[1] if x[0] == 0 else 0, pairs))))
-x2 = list(filter(lambda x : x>0,  (map(lambda x: x[1] if x[0] == 1 else 0, pairs))))
-x3 = list(filter(lambda x : x>0,  (map(lambda x: x[1] if x[0] == 2 else 0, pairs))))
-x4 = list(filter(lambda x : x>0,  (map(lambda x: x[1] if x[0] == 3 else 0, pairs))))
+# y = test_samps.loc[:,'F-Expr-Size'].values
+# pairs = zip(resacc,y)
+# x1 = list(filter(lambda x : x>0,  (map(lambda x: x[1] if x[0] == 0 else 0, pairs))))
+# x2 = list(filter(lambda x : x>0,  (map(lambda x: x[1] if x[0] == 1 else 0, pairs))))
+# x3 = list(filter(lambda x : x>0,  (map(lambda x: x[1] if x[0] == 2 else 0, pairs))))
+# x4 = list(filter(lambda x : x>0,  (map(lambda x: x[1] if x[0] == 3 else 0, pairs))))
 
 
 
-trace1 = go.Histogram(
-    x=x1,
-    name='True Negative',
-    marker=dict(
-        color='r',
-    ),
-    opacity=1
-)
+# trace1 = go.Histogram(
+#     x=x1,
+#     name='True Negative',
+#     marker=dict(
+#         color='r',
+#     ),
+#     opacity=1
+# )
 
-trace2 = go.Histogram(
-    x=x2,
-    name='False Positive',
-    marker=dict(
-        color='b',
-    ),
-    opacity=0.75
-)
+# trace2 = go.Histogram(
+#     x=x2,
+#     name='False Positive',
+#     marker=dict(
+#         color='b',
+#     ),
+#     opacity=0.75
+# #    nbinx
+# )
 
-trace3 = go.Histogram(
-    x=x3,
-    name='False Negative',
-    marker=dict(
-        color='r',
-    ),
-    opacity=0.75
-)
+# trace3 = go.Histogram(
+#     x=x3,
+#     name='False Negative',
+#     marker=dict(
+#         color='r',
+#     ),
+#     opacity=0.75
+# )
 
-trace4 = go.Histogram(
-    x=x4,
-    name='True Positive',
-    marker=dict(
-        color='b',
-    ),
-    opacity=1
-)
+# trace4 = go.Histogram(
+#     x=x4,
+#     name='True Positive',
+#     marker=dict(
+#         color='b',
+#     ),
+#     opacity=1
+# )
 
 
 
-data = [trace1, trace2, trace3, trace4]
+# data = [trace1, trace2, trace3, trace4]
 
-layout = go.Layout(
-    title='Sampled Results',
-    xaxis=dict(
-        title='Expression Size'
-    ),
-    yaxis=dict(
-        title='Count'
-    ),
-    bargap=0.2,
-    bargroupgap=0.1
-)
-fig = go.Figure(data=data, layout=layout)
-py.iplot(fig, filename='Expression Size Analysis')
+# layout = go.Layout(
+#     title='Sampled Results',
+#     xaxis=dict(
+#         title='Expression Size'
+#     ),
+#     yaxis=dict(
+#         title='Count'
+#     ),
+#     bargap=0.2,
+#     bargroupgap=0.1
+# )
+# fig = go.Figure(data=data, layout=layout)
+# py.iplot(fig, filename='Expression Size Analysis')
 
 
 #-----PLOTTING
@@ -188,7 +189,7 @@ py.iplot(fig, filename='Expression Size Analysis')
 
 #testanses =test_labels.values
 resacc = anses + 2*test_labels.values
-acc = 1-((sum(abs(anses - test_labels.values)))/3600)
+#acc = 1-((sum(abs(anses - test_labels.values)))/3600)
 
 #lol = test_labels.add((-1)*anses)
 
@@ -261,19 +262,24 @@ for labelind in list(set(test_labels.index)):
 	yay2 = yay2+a2
 	yay3 = yay3+a3
 
+print "precision for top 3"
+print 'top 1' 
 print float(yay1)/tots
+print 'top 2' 
 print float(yay2)/tots
+print 'top 3'
 print float(yay3)/tots
-print tots
-print tp
-print sum(test_labels.values)
+# print tots
+# print tp
+# print sum(test_labels.values)
+print "recall for top 3"
 print tp/sum(test_labels.values)
 # print heat
 # print fs
 
-data = [go.Bar(
-            x=fs,
-            y=heat
-    )]
+# data = [go.Bar(
+#             x=fs,
+#             y=heat
+#     )]
 
-py.iplot(data, filename='fa15new-bar')
+#py.iplot(data, filename='fa15new-bar')

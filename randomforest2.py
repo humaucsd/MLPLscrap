@@ -8,10 +8,10 @@ from sklearn.ensemble import RandomForestClassifier
 import numpy as np
 import pandas as pd
 
-import input
+import input_old
 
-csvs2 = [f for f in os.listdir('ml2-master2/data/fa15/op+context-count+type+size') if f.endswith('.csv')]
-csvs = [f for f in os.listdir('ml2-master2/data/sp14/op+context-count+type+size') if f.endswith('.csv')]
+csvs2 = [f for f in os.listdir('ml2/data/fa15/op+context-count+type+size') if f.endswith('.csv')]
+csvs = [f for f in os.listdir('ml2/data/sp14/op+context-count+type+size') if f.endswith('.csv')]
 
 random.shuffle(csvs)
 dfs = []
@@ -19,7 +19,7 @@ test = []
 train = []
 
 for csv in csvs:
-	df, fs, ls = input.load_csv(os.path.join('ml2-master2/data/sp14/op+context-count+type+size', csv), filter_no_labels=True, only_slice=False)
+	df, fs, ls = input_old.load_csv(os.path.join('ml2/data/sp14/op+context-count+type+size', csv), filter_no_labels=True, only_slice=False)
 
 	if df is None:
 		continue
@@ -29,7 +29,7 @@ for csv in csvs:
 	train.append(df)
 
 for csv in csvs2:
-	df2, fs2, ls2 = input.load_csv(os.path.join('ml2-master2/data/fa15/op+context-count+type+size', csv), filter_no_labels=True, only_slice=False)
+	df2, fs2, ls2 = input_old.load_csv(os.path.join('ml2/data/fa15/op+context-count+type+size', csv), filter_no_labels=True, only_slice=False)
 
 	if df2 is None:
 		continue
@@ -43,8 +43,8 @@ for csv in csvs2:
 train = pd.concat(train)
 test = pd.concat(test)
 
-print (len(test))  
-print (len(train))  
+# print (len(test))  
+# print (len(train))  
 
 
 # print (df.shape)
@@ -53,7 +53,7 @@ classes = list(train.groupby(ls2))
 #print(ls)
 max_samples = max(len(c) for _, c in classes)
 train = pd.concat(c.sample(max_samples, replace=True) for _, c in classes)
-print (len(train))  
+# print (len(train))  
 #print df.shape
 #print type(df)
 #list_keys = [ k for k in df ]
@@ -71,10 +71,10 @@ train_labels = train.loc[:,'L-DidChange']
 # print test
 test_samps = test.loc[:,'F-InSlice':]
 test_labels = test.loc[:,'L-DidChange']
+test_span = test.loc[:,'SourceSpan']
 
 # print test.iloc[1]
 # print test.values[1]
-
 
 # dflist = []
 # keylist = []
@@ -112,13 +112,13 @@ prob_error = [item[1] for item in prob_score]
 
 # print prob_error
 
-ll = zip(prob_error, resacc)
+ll = zip(prob_error, anses, test_labels.values, test_span)
 
-score = pd.DataFrame(data=ll, index=test_labels.index, columns=['Error Probability','B'])
+score = pd.DataFrame(data=ll, index=test_labels.index, columns=['Error Probability','predictions', 'actual' ,'SourceSpan'])
 # print score
 
-print 'recall is ' + str(sum(anses * test_labels.values)/sum(test_labels.values))
-print 'precision is ' + str(sum(anses * test_labels.values)/sum(anses))
+# print 'recall is ' + str(sum(anses * test_labels.values)/sum(test_labels.values))
+# print 'precision is ' + str(sum(anses * test_labels.values)/sum(anses))
 
 yay1 = 0
 yay2 = 0
@@ -135,20 +135,28 @@ for labelind in list(set(test_labels.index)):
 		continue
 	tots = tots+1
 	topn = temp[np.argsort(temp[:,0])]
+# write in file
+	# filenm = str(labelind).split('.')
+	# f = open('results/' + filenm[0] +'.out', "w+")
+	# for preds in topn:
+	# 	if preds[1] == 1:
+	# 		f.write(str(preds[3]) + '\n')
+
+	f.close()
 	# print topn
 	# print 'lol'
 	# print topn[-3:]
 	a3 = 0
 	a2 = 0
 	a1 = 0
-	if (abs(topn[-3][1] -3) <= 0.1) :
+	if (topn[-3][1] == 1 and topn[-3][2] == 1) :
 		a3 = 1
 		tp = tp+1
-	if (abs(topn[-2][1] -3) <= 0.1) :
+	if (topn[-2][1] == 1 and topn[-2][2] == 1) :
 		a3 = 1
 		a2 = 1
 		tp = tp+1
-	if (abs(topn[-1][1] -3) <= 0.1) :
+	if (topn[-1][1] == 1 and topn[-1][2] == 1) :
 		a3 = 1
 		a2 = 1
 		a1 = 1
@@ -157,11 +165,15 @@ for labelind in list(set(test_labels.index)):
 	yay2 = yay2+a2
 	yay3 = yay3+a3
 
+print "precision for top 3"
+print 'top 1' 
 print float(yay1)/tots
+print 'top 2' 
 print float(yay2)/tots
+print 'top 3'
 print float(yay3)/tots
-print tots
-print tp
-print sum(test_labels.values)
+# print tots
+# print tp
+# print sum(test_labels.values)
+print "recall for top 3"
 print tp/sum(test_labels.values)
-

@@ -11,6 +11,8 @@ import pydotplus
 from IPython.display import Image  
 from sklearn.ensemble import RandomForestClassifier
 
+import plotly.plotly as py
+import plotly.graph_objs as go
 
 import input
 
