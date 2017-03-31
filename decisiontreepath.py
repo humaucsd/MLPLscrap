@@ -16,8 +16,8 @@ from IPython.display import Image
 
 import input_old
 
-csvs2 = [f for f in os.listdir('ml2/data/fa15/op+type+size') if f.endswith('.csv')]
-csvs = [f for f in os.listdir('ml2/data/sp14/op+type+size') if f.endswith('.csv')]
+csvs2 = [f for f in os.listdir('ml2/data/fa15/op+context+type') if f.endswith('.csv')]
+csvs = [f for f in os.listdir('ml2/data/sp14/op+context+type') if f.endswith('.csv')]
 
 random.shuffle(csvs)
 dfs = []
@@ -25,7 +25,7 @@ test = []
 train = []
 
 for csv in csvs2:
-	df, fs, ls = input_old.load_csv(os.path.join('ml2/data/fa15/op+type+size', csv), filter_no_labels=True, only_slice=False)
+	df, fs, ls = input_old.load_csv(os.path.join('ml2/data/fa15/op+context+type', csv), filter_no_labels=True, only_slice=False)
 
 	if df is None:
 		continue
@@ -35,7 +35,7 @@ for csv in csvs2:
 	train.append(df)
 
 for csv in csvs:
-	df2, fs2, ls2 = input_old.load_csv(os.path.join('ml2/data/sp14/op+type+size', csv), filter_no_labels=True, only_slice=False)
+	df2, fs2, ls2 = input_old.load_csv(os.path.join('ml2/data/sp14/op+context+type', csv), filter_no_labels=True, only_slice=False)
 
 	if df2 is None:
 		continue
@@ -71,15 +71,16 @@ train = pd.concat(c.sample(max_samples, replace=True) for _, c in classes)
 
 
 
-train_samps = train.loc[:,'F-InSlice':]
+train_samps = train.loc[:,'F-Is-Eq' :]
 train_labels = train.loc[:,'L-DidChange']
 
 # print test
-test_samps = test.loc[:,'F-InSlice':]
+test_samps = test.loc[:,'F-Is-Eq' :]
 test_labels = test.loc[:,'L-DidChange']
 test_span = test.loc[:,'SourceSpan']
 # print test.iloc[1]
 # print test.values[1]
+feature_names = fs[1:]
 
 
 # dflist = []
@@ -107,7 +108,7 @@ anses = estimator.predict(test_samps.values)
 #-------importances
 
 # imps = estimator.feature_importances_
-# imp_features = [(y,x) for (y,x) in sorted(zip(imps,fs))]
+# imp_features = [(y,x) for (y,x) in sorted(zip(imps,feature_names))]
 # imp_features.reverse()
 # for elem in imp_features:
 #         print elem  
@@ -183,13 +184,13 @@ for labelind in list(set(test_labels.index)):
 	yay2 = yay2+a2
 	yay3 = yay3+a3
 
-# print "precision for top 3"
-# print 'top 1' 
-# print float(yay1)/tots
-# print 'top 2' 
-# print float(yay2)/tots
-# print 'top 3'
-# print float(yay3)/tots
+print "precision for top 3"
+print 'top 1' 
+print float(yay1)/tots
+print 'top 2' 
+print float(yay2)/tots
+print 'top 3'
+print float(yay3)/tots
 
 # print tots
 # print tp
@@ -200,7 +201,7 @@ print tp/sum(test_labels.values)
 
 # # -----PLOTTING
 dot_data = tree.export_graphviz(estimator, out_file=None,
-	feature_names=fs, 
+	feature_names=feature_names, 
 	filled=True, 
 	rounded=True) 
 graph = pydotplus.graph_from_dot_data(dot_data) 
@@ -300,7 +301,7 @@ leave_id = estimator.apply(X_test)
 
 #print (estimator.decision_path(X_test[50]))
 
-samp_indsb = test_samps.index.get_loc(0865.0)
+samp_indsb = test_samps.index.get_loc(1655.0)
 samp_inds = [i for i, x in enumerate(samp_indsb) if x]
 
 
@@ -336,4 +337,4 @@ for ind in samp_inds:
 	                 X_test[sample_id, feature[node_id]], # <-- changed i to sample_id
 	                 threshold_sign,
 	                 threshold[node_id]))
-	        print(fs2[feature[node_id]]);
+	        print(feature_names[feature[node_id]]);
