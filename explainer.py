@@ -61,15 +61,15 @@ train = pd.concat(c.sample(max_samples, replace=True) for _, c in classes)
 
 
 
-train_samps = train.loc[:,'F-InSlice':]
+train_samps = train.loc[:,'F-Is-Eq':] # changed from In-Slice
 train_labels = train.loc[:,'L-DidChange']
 
 # print test
-test_samps = test.loc[:,'F-InSlice':]
+test_samps = test.loc[:,'F-Is-Eq':]  #
 test_labels = test.loc[:,'L-DidChange']
 test_span = test.loc[:,'SourceSpan']
 
-rf = RandomForestClassifier(n_estimators=30)
+rf = RandomForestClassifier(n_estimators=1)
 rf = rf.fit(train_samps.values, train_labels.values)
 
 anses = rf.predict(test_samps.values)
@@ -89,10 +89,38 @@ explainer = lime.lime_tabular.LimeTabularExplainer(train_samps.values, feature_n
 
 # exp.save_to_file('/tmp/oi.html')
 
-k = 0
-for t in temp:
-	exp = explainer.explain_instance(t, rf.predict_proba,  num_features=10)
-	exp.save_to_file('/tmp/' + str(k) + 'oi.html')
-	k = k+1
-	print (t)
-	print (exp.as_list())
+def gain (X, V, W, I):
+	
+
+def submodular_pick (B, X, explainer):
+	num_instances = len(X)
+	num_feats = len(X[0])
+	# print(num_feats)
+
+	W = np.zeros((num_instances, num_feats))
+	k = 0
+	for t in X:
+		exp = explainer.explain_instance(t, rf.predict_proba,  num_features= num_feats)
+		exp.save_to_file('/tmp/' + str(k) + 'oi.html')
+		imps = [x for (y, x) in sorted(exp.as_list())]
+		# print (imps)
+		W [k,:] = np.absolute(np.asarray(imps))
+		k = k+1
+		# print (exp.as_list())
+	print (W)
+	I = np.sum(W, axis=0) #haven't square-rooted
+	# print (I)
+
+	W[W != 0] =1
+	# print(W)
+
+	V = np.zeros(num_instances)
+	F = np.zeros(num_feats)
+	while (np.sum(V) < B) :
+		gain = np.zeros(num_instances)
+		for i in range(num_instances):
+			g [(F+W[i, :]) > 0] = 1
+
+	return 0;
+
+submodular_pick(2, temp, explainer)
