@@ -89,8 +89,6 @@ explainer = lime.lime_tabular.LimeTabularExplainer(train_samps.values, feature_n
 
 # exp.save_to_file('/tmp/oi.html')
 
-def gain (X, V, W, I):
-	
 
 def submodular_pick (B, X, explainer):
 	num_instances = len(X)
@@ -107,7 +105,7 @@ def submodular_pick (B, X, explainer):
 		W [k,:] = np.absolute(np.asarray(imps))
 		k = k+1
 		# print (exp.as_list())
-	print (W)
+	# print (W)
 	I = np.sum(W, axis=0) #haven't square-rooted
 	# print (I)
 
@@ -119,8 +117,12 @@ def submodular_pick (B, X, explainer):
 	while (np.sum(V) < B) :
 		gain = np.zeros(num_instances)
 		for i in range(num_instances):
+			g = np.zeros(num_feats)
 			g [(F+W[i, :]) > 0] = 1
+			gain[i] = (sum(np.multiply(g,I)))
+		bestinst = np.argmax(gain)
+		V[(bestinst)] = 1
+		F[(W[bestinst,:] > 0)] =1	
+	return V;
 
-	return 0;
-
-submodular_pick(2, temp, explainer)
+print (submodular_pick(1, temp, explainer))
